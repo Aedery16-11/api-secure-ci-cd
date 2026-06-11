@@ -18,3 +18,18 @@ jobs:
         uses: gitleaks/gitleaks-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  test: 
+    runs-on: ubuntu-latest
+    permissions: 
+        contents: read
+    steps:
+     - name: Checkout code
+       uses: actions/checkout@v6
+     - name: Setup python  
+       uses: actions/setup-python@v6
+       with:
+        python-version: '3.13' 
+     - name: Install Python dependencies
+       run: pip install -r requirements.txt
+     - name: Run pytest
+       run: pytest -q
