@@ -1,0 +1,20 @@
+name: CICD
+on: [push]  
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    permissions: 
+        security-events: write # lorsqu'on liste une permission il faut toutes les lister, et celles ci sont nécessaires : moindre privilège. 
+        contents: read
+        actions: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Perform Bandit Analysis #SAST : auditer le code sans le run
+        uses: PyCQA/bandit-action@v1
+      - name: Check secret leaks   #scan des secrets
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
