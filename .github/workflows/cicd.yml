@@ -33,3 +33,40 @@ jobs:
        run: pip install -r requirements.txt
      - name: Run pytest
        run: pytest -q
+
+  build-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read          # Required to checkout and read repo files
+      security-events: write  # Required to upload SARIF files to Security tab
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+    - name: Build an image from Dockerfile
+      run: docker build -t api-tickets .
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@v0.36.0
+      with:
+        image-ref: 'api-tickets'
+        format: 'table'
+        exit-code: '1'
+        ignore-unfixed: true
+        vuln-type: 'os,library'
+        severity: 'CRITICAL,HIGH, MEDIUM'
+    - name: Run Trivy vulnerability scanner in IaC mode
+      if: always()
+      uses: aquasecurity/trivy-action@v0.36.0
+      with:
+        scan-ref: '.'
+        scan-type: 'config'
+        hide-progress: true 
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        exit-code: '1'
+        severity: 'CRITICAL,HIGH'
+
+    - name: Upload Trivy scan results to GitHub Security tab
+      if: always()
+      uses: github/codeql-action/upload-sarif@v4
+      with:
+        sarif_file: 'trivy-results.sarif'
