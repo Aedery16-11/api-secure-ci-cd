@@ -48,7 +48,7 @@ jobs:
       uses: aquasecurity/trivy-action@v0.36.0
       with:
         image-ref: 'api-tickets'
-        format: 'table'
+        format: 'sarif'
         exit-code: '1'
         ignore-unfixed: true
         vuln-type: 'os,library'
