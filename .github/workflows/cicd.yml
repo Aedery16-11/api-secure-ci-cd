@@ -48,9 +48,8 @@ jobs:
       uses: aquasecurity/trivy-action@v0.36.0
       with:
         image-ref: 'api-tickets'
-        format: 'sarif'
+        format: 'table'
         exit-code: '1'
-        output: 'trivy-image.sarif'
         ignore-unfixed: true
         vuln-type: 'os,library'
         severity: 'CRITICAL,HIGH,MEDIUM'
@@ -62,7 +61,7 @@ jobs:
         scan-type: 'config'
         hide-progress: true 
         format: 'sarif'
-        output: 'trivy-iac.sarif'
+        output: 'trivy-results.sarif'
         exit-code: '1'
         severity: 'CRITICAL,HIGH'
 
