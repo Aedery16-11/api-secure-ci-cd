@@ -1,12 +1,12 @@
 name: CICD
-on: [push]  
+on: [push]
 jobs:
   analyze:
     runs-on: ubuntu-latest
-    permissions: 
-        security-events: write # lorsqu'on liste une permission il faut toutes les lister, et celles ci sont nécessaires : moindre privilège. 
-        contents: read
-        actions: read
+    permissions:
+      security-events: write # lorsqu'on liste une permission il faut toutes les lister, et celles ci sont nécessaires : moindre privilège.
+      contents: read
+      actions: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -14,59 +14,59 @@ jobs:
           fetch-depth: 0
       - name: Perform Bandit Analysis #SAST : auditer le code sans le run
         uses: PyCQA/bandit-action@v1
-      - name: Check secret leaks   #scan des secrets
+      - name: Check secret leaks #scan des secrets
         uses: gitleaks/gitleaks-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  test: 
+  test:
     runs-on: ubuntu-latest
-    permissions: 
-        contents: read
+    permissions:
+      contents: read
     steps:
-     - name: Checkout code
-       uses: actions/checkout@v6
-     - name: Setup python  
-       uses: actions/setup-python@v6
-       with:
-        python-version: '3.11' 
-     - name: Install Python dependencies
-       run: pip install -r requirements.txt
-     - name: Run pytest
-       run: pytest -q
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Setup python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+      - name: Run pytest
+        run: pytest -q
 
   build-scan:
     runs-on: ubuntu-latest
     permissions:
-      contents: read          # Required to checkout and read repo files
-      security-events: write  # Required to upload SARIF files to Security tab
+      contents: read # Required to checkout and read repo files
+      security-events: write # Required to upload SARIF files to Security tab
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v6
-    - name: Build an image from Dockerfile
-      run: docker build -t api-tickets .
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@v0.36.0
-      with:
-        image-ref: 'api-tickets'
-        format: 'table'
-        exit-code: '1'
-        ignore-unfixed: true
-        vuln-type: 'os,library'
-        severity: 'CRITICAL,HIGH,MEDIUM'
-    - name: Run Trivy vulnerability scanner in IaC mode
-      if: always()
-      uses: aquasecurity/trivy-action@v0.36.0
-      with:
-        scan-ref: '.'
-        scan-type: 'config'
-        hide-progress: true 
-        format: 'sarif'
-        output: 'trivy-results.sarif'
-        exit-code: '1'
-        severity: 'CRITICAL,HIGH'
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Build an image from Dockerfile
+        run: docker build -t api-tickets .
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: "api-tickets"
+          format: "table"
+          exit-code: "1"
+          ignore-unfixed: true
+          vuln-type: "os,library"
+          severity: "CRITICAL,HIGH,MEDIUM"
+      - name: Run Trivy vulnerability scanner in IaC mode
+        if: always()
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-ref: "."
+          scan-type: "config"
+          hide-progress: true
+          format: "sarif"
+          output: "trivy-results.sarif"
+          exit-code: "1"
+          severity: "CRITICAL,HIGH"
 
-    - name: Upload Trivy scan results to GitHub Security tab
-      if: always()
-      uses: github/codeql-action/upload-sarif@v4
-      with:
-        sarif_file: 'trivy-results.sarif'
+      - name: Upload Trivy scan results to GitHub Security tab
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: "trivy-results.sarif"
