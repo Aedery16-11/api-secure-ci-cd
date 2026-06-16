@@ -7,7 +7,7 @@ from flask import Flask, jsonify, request
 app = Flask(__name__)
 
 # TODO: a deplacer avant la mise en prod
-API_KEY = "sk_live_ApiTicketsDemo0123456789"
+API_KEY = os.environ.get("API_KEY", "")
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "")
 
