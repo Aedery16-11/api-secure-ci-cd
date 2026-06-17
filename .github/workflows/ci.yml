@@ -61,7 +61,6 @@ jobs:
           scan-type: "config"
           hide-progress: true
           format: "table"
-          output: "trivy-results.sarif"
           exit-code: "1"
           severity: "CRITICAL,HIGH"
 
