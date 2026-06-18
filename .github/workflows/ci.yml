@@ -94,4 +94,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            whoami
+            docker pull aaron279/api-secure:latest
+            docker stop api-secure || true
+            docker rm api-secure || true
+            docker run -d --name api-secure -p 5000:5000 aaron279/api-secure:latest
