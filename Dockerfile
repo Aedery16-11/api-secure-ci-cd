@@ -6,8 +6,8 @@ WORKDIR /app
 COPY . .
 
 RUN pip install -r requirements.txt
-RUN useradd -u 8877 john
-USER john
+# RUN useradd -u 8877 john
+# USER john
 
 EXPOSE 5000
 
